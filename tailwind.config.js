@@ -6,7 +6,12 @@ module.exports = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'geist': ['var(--font-geist)'],
+        'geist-mono': ['var(--font-geist-mono)']
+      },
+    },
   },
   plugins: [],
 }
