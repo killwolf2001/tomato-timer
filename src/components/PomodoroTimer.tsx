@@ -192,8 +192,9 @@ export default function PomodoroTimer() {
     let timer: NodeJS.Timeout;
 
     const handleTimerComplete = () => {
-      // Play notification sound
+      // Play notification sound and show notification
       new Audio('/notification.mp3').play().catch(() => {});
+      notify(isFocusTime ? '休息時間到了！' : '該開始專注了！');
       
       // Switch between focus and break time
       const newIsFocusTime = !isFocusTime;
@@ -256,12 +257,12 @@ export default function PomodoroTimer() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-2xl mx-auto p-6 space-y-6">
       <Auth />
       
-      <div className="task-card mb-6">
+      <div className="card">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+          <h1 className="text-3xl font-bold text-primary bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
             {isFocusTime ? '專注時間' : '休息時間'}
           </h1>
           {user && (
@@ -289,7 +290,8 @@ export default function PomodoroTimer() {
         <div className="flex justify-center gap-4 mb-6">
           <button
             onClick={toggleTimer}
-            className="btn-primary flex items-center gap-2"
+            className="btn btn-primary"
+            disabled={!currentTask && isFocusTime}
           >
             {isRunning ? (
               <>
@@ -309,7 +311,7 @@ export default function PomodoroTimer() {
           </button>
           <button
             onClick={() => setTimeLeft(isFocusTime ? settings.focusTime * 60 : settings.breakTime * 60)}
-            className="btn-primary bg-gray-500 hover:bg-gray-600 flex items-center gap-2"
+            className="btn btn-secondary"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -320,50 +322,56 @@ export default function PomodoroTimer() {
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div>
-            <label className="block text-sm font-medium mb-1">專注時間 (分鐘)</label>
+            <label className="label">專注時間 (分鐘)</label>
             <input
               type="number"
               value={settings.focusTime}
               onChange={(e) => updateSettings(parseInt(e.target.value) || 25, settings.breakTime)}
-              className="w-full px-3 py-2 border rounded"
+              className="input"
               min="1"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">休息時間 (分鐘)</label>
+            <label className="label">休息時間 (分鐘)</label>
             <input
               type="number"
               value={settings.breakTime}
               onChange={(e) => updateSettings(settings.focusTime, parseInt(e.target.value) || 5)}
-              className="w-full px-3 py-2 border rounded"
+              className="input"
               min="1"
             />
           </div>
         </div>
 
         {isFocusTime && (
-          <div className="mb-6">
-            <input
-              type="text"
-              placeholder="正在進行的任務..."
-              value={currentTask}
-              onChange={(e) => setCurrentTask(e.target.value)}
-              className="w-full px-3 py-2 border rounded mb-2"
-            />
-            <textarea
-              placeholder="備註..."
-              value={currentNotes}
-              onChange={(e) => setCurrentNotes(e.target.value)}
-              className="w-full px-3 py-2 border rounded h-24"
-            />
+          <div className="mb-6 space-y-4">
+            <div>
+              <label className="label">當前任務</label>
+              <input
+                type="text"
+                placeholder="正在進行的任務..."
+                value={currentTask}
+                onChange={(e) => setCurrentTask(e.target.value)}
+                className="input"
+              />
+            </div>
+            <div>
+              <label className="label">備註</label>
+              <textarea
+                placeholder="添加一些任務細節..."
+                value={currentNotes}
+                onChange={(e) => setCurrentNotes(e.target.value)}
+                className="input min-h-[6rem] resize-y"
+              />
+            </div>
           </div>
         )}
       </div>
 
-      <div className="task-card">
-        <div className="flex justify-between items-center mb-4">
+      <div className="card">
+        <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             工作記錄
@@ -373,11 +381,17 @@ export default function PomodoroTimer() {
               <>
                 <button
                   onClick={exportData}
-                  className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+                  className="btn btn-primary"
                 >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
                   導出數據
                 </button>
-                <label className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm cursor-pointer">
+                <label className="btn btn-outline cursor-pointer">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
                   導入數據
                   <input
                     type="file"
@@ -391,15 +405,30 @@ export default function PomodoroTimer() {
           </div>
         </div>
         <div className="space-y-4">
-          {tasks.map((task) => (
-            <div key={task.id} className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
-              <div className="font-medium">{task.title}</div>
-              <div className="text-gray-600 text-sm">{task.notes}</div>
-              <div className="text-gray-400 text-xs">
-                {new Date(task.timestamp).toLocaleString()}
-              </div>
+          {tasks.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <svg className="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <p className="text-lg font-medium">暫無工作記錄</p>
+              <p className="text-sm">完成一個番茄鐘週期後，記錄將顯示在這裡</p>
             </div>
-          ))}
+          ) : (
+            tasks.map((task) => (
+              <div key={task.id} className="card card-hover bg-gray-50">
+                <div className="font-medium text-gray-900">{task.title}</div>
+                {task.notes && (
+                  <div className="mt-2 text-gray-600 text-sm">{task.notes}</div>
+                )}
+                <div className="mt-3 text-gray-400 text-xs flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {new Date(task.timestamp).toLocaleString()}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
