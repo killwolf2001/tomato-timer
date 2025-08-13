@@ -1,6 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 番茄鐘 - 專注時間管理工具
 
-## Getting Started
+這是一個現代化的番茄鐘應用，幫助您更好地管理時間和提高工作效率。
+
+## 功能特點
+
+- 🎯 專注時間和休息時間的靈活設置
+- 💾 本地數據保存
+- ☁️ 雲端同步（需要登錄）
+- 📱 響應式設計，支持各種設備
+- 📝 任務記錄和筆記功能
+- 🔔 時間結束提醒
+- 📊 工作記錄追踪
+- 💫 優雅的界面設計
+
+## 在線使用
+
+訪問：[https://tomato-timer-6opd5yoh6-killwolf2001s-projects.vercel.app](https://tomato-timer-6opd5yoh6-killwolf2001s-projects.vercel.app)
+
+## 開始使用
 
 First, run the development server:
 
