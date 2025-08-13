@@ -29,6 +29,19 @@ export default function PomodoroTimer() {
     focusTime: 25,
     breakTime: 5
   };
+  
+  // Add notification function
+  const notify = (message: string) => {
+    if (Notification.permission === 'granted') {
+      new Notification(message);
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          new Notification(message);
+        }
+      });
+    }
+  };
   const [settings, setSettings] = useState<TimerSettings>(defaultSettings);
   const [timeLeft, setTimeLeft] = useState(defaultSettings.focusTime * 60);
   const [isRunning, setIsRunning] = useState(false);
@@ -246,9 +259,9 @@ export default function PomodoroTimer() {
     <div className="max-w-2xl mx-auto p-6">
       <Auth />
       
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <div className="task-card mb-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
             {isFocusTime ? '專注時間' : '休息時間'}
           </h1>
           {user && (
@@ -269,21 +282,38 @@ export default function PomodoroTimer() {
           )}
         </div>
         
-        <div className="text-6xl font-mono text-center mb-6">
+        <div className="timer-display">
           {formatTime(timeLeft)}
         </div>
 
         <div className="flex justify-center gap-4 mb-6">
           <button
             onClick={toggleTimer}
-            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="btn-primary flex items-center gap-2"
           >
-            {isRunning ? '暫停' : '開始'}
+            {isRunning ? (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
+                </svg>
+                暫停
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+                開始
+              </>
+            )}
           </button>
           <button
             onClick={() => setTimeLeft(isFocusTime ? settings.focusTime * 60 : settings.breakTime * 60)}
-            className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            className="btn-primary bg-gray-500 hover:bg-gray-600 flex items-center gap-2"
           >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
             重置
           </button>
         </div>
@@ -330,9 +360,14 @@ export default function PomodoroTimer() {
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="task-card">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">工作記錄</h2>
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            工作記錄
+          </h2>
           <div className="flex gap-2">
             {!user && (
               <>
@@ -357,7 +392,7 @@ export default function PomodoroTimer() {
         </div>
         <div className="space-y-4">
           {tasks.map((task) => (
-            <div key={task.id} className="border-b pb-4">
+            <div key={task.id} className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
               <div className="font-medium">{task.title}</div>
               <div className="text-gray-600 text-sm">{task.notes}</div>
               <div className="text-gray-400 text-xs">
