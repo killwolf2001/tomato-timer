@@ -257,12 +257,12 @@ export default function PomodoroTimer() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-6">
+    <div className="p-4 space-y-6">
       <Auth />
       
-      <div className="card">
+      <div className="card shadow-lg">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-primary bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
+          <h1 className="text-4xl font-bold text-primary bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
             {isFocusTime ? '專注時間' : '休息時間'}
           </h1>
           {user && (

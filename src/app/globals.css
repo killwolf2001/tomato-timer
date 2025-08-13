@@ -22,6 +22,16 @@ body {
   background-color: var(--background);
   min-height: 100vh;
   font-family: var(--font-geist-sans);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+main {
+  width: 100%;
+  max-width: min(50%, 800px);
+  margin: 2rem auto;
+  min-width: 320px;
 }
 
 .timer-display {
@@ -119,15 +129,30 @@ body {
 
 .card {
   background-color: var(--card-background);
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  border-radius: 1.5rem;
+  padding: 2rem;
   transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, var(--primary), #60a5fa);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .card-hover:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 body {
