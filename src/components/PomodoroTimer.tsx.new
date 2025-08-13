@@ -1,0 +1,326 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, db } from '@/lib/firebase';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import Auth from './Auth';
+
+interface TimerSettings {
+  focusTime: number;
+  breakTime: number;
+}
+
+interface Task {
+  id: string;
+  title: string;
+  notes: string;
+  timestamp: string;
+}
+
+interface SavedData {
+  settings: TimerSettings;
+  tasks: Task[];
+}
+
+export default function PomodoroTimer() {
+  const [user] = useAuthState(auth);
+  const [settings, setSettings] = useState<TimerSettings>({
+    focusTime: 25,
+    breakTime: 5
+  });
+  const [timeLeft, setTimeLeft] = useState(settings.focusTime * 60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isFocusTime, setIsFocusTime] = useState(true);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [currentTask, setCurrentTask] = useState('');
+  const [currentNotes, setCurrentNotes] = useState('');
+  const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error'>('synced');
+
+  // 導出數據到檔案
+  const exportData = () => {
+    const data: SavedData = {
+      settings,
+      tasks
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tomato-timer-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // 導入數據從檔案
+  const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data: SavedData = JSON.parse(e.target?.result as string);
+          setSettings(data.settings);
+          setTasks(data.tasks);
+          localStorage.setItem('pomodoroSettings', JSON.stringify(data.settings));
+          localStorage.setItem('pomodoroTasks', JSON.stringify(data.tasks));
+          alert('數據導入成功！');
+        } catch {
+          alert('導入失敗：無效的檔案格式');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  // Load saved settings and tasks
+  useEffect(() => {
+    const loadData = async () => {
+      if (user) {
+        try {
+          setSyncStatus('syncing');
+          const docRef = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data() as SavedData;
+            setSettings(data.settings);
+            setTasks(data.tasks);
+          }
+          setSyncStatus('synced');
+        } catch {
+          setSyncStatus('error');
+          // 如果雲端同步失敗，嘗試從本地讀取
+          const savedSettings = localStorage.getItem('pomodoroSettings');
+          const savedTasks = localStorage.getItem('pomodoroTasks');
+          
+          if (savedSettings) {
+            setSettings(JSON.parse(savedSettings));
+          }
+          if (savedTasks) {
+            setTasks(JSON.parse(savedTasks));
+          }
+        }
+      } else {
+        // 未登入時從本地讀取
+        const savedSettings = localStorage.getItem('pomodoroSettings');
+        const savedTasks = localStorage.getItem('pomodoroTasks');
+        
+        if (savedSettings) {
+          setSettings(JSON.parse(savedSettings));
+        }
+        if (savedTasks) {
+          setTasks(JSON.parse(savedTasks));
+        }
+      }
+    };
+
+    loadData();
+  }, [user]);
+
+  // Save data
+  const saveData = useCallback(async () => {
+    // 總是保存到本地
+    localStorage.setItem('pomodoroSettings', JSON.stringify(settings));
+    localStorage.setItem('pomodoroTasks', JSON.stringify(tasks));
+    
+    // 如果已登入，同時保存到雲端
+    if (user) {
+      try {
+        setSyncStatus('syncing');
+        await setDoc(doc(db, 'users', user.uid), {
+          settings,
+          tasks
+        });
+        setSyncStatus('synced');
+      } catch {
+        setSyncStatus('error');
+      }
+    }
+  }, [settings, tasks, user]);
+
+  // 當設置或任務改變時保存數據
+  useEffect(() => {
+    saveData();
+  }, [settings, tasks, saveData]);
+
+  // Timer logic
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (isRunning && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      // Play notification sound
+      new Audio('/notification.mp3').play().catch(() => {});
+      
+      // Switch between focus and break time
+      setIsFocusTime((prev) => !prev);
+      setTimeLeft(isFocusTime ? settings.breakTime * 60 : settings.focusTime * 60);
+      
+      if (isFocusTime) {
+        // Save task when focus time ends
+        if (currentTask) {
+          const newTask: Task = {
+            id: Date.now().toString(),
+            title: currentTask,
+            notes: currentNotes,
+            timestamp: new Date().toISOString()
+          };
+          setTasks((prev) => [...prev, newTask]);
+          setCurrentTask('');
+          setCurrentNotes('');
+        }
+      }
+    }
+
+    return () => clearInterval(timer);
+  }, [isRunning, timeLeft, isFocusTime, settings, currentTask, currentNotes]);
+
+  const toggleTimer = useCallback(() => {
+    setIsRunning((prev) => !prev);
+  }, []);
+
+  const updateSettings = useCallback((focusTime: number, breakTime: number) => {
+    setSettings({ focusTime, breakTime });
+    setTimeLeft(focusTime * 60);
+  }, []);
+
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      <Auth />
+      
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">
+            {isFocusTime ? '專注時間' : '休息時間'}
+          </h1>
+          {user && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm">
+                {syncStatus === 'synced' && '已同步'}
+                {syncStatus === 'syncing' && '同步中...'}
+                {syncStatus === 'error' && '同步失敗'}
+              </span>
+              <div 
+                className={`w-2 h-2 rounded-full ${
+                  syncStatus === 'synced' ? 'bg-green-500' :
+                  syncStatus === 'syncing' ? 'bg-yellow-500' :
+                  'bg-red-500'
+                }`}
+              />
+            </div>
+          )}
+        </div>
+        
+        <div className="text-6xl font-mono text-center mb-6">
+          {formatTime(timeLeft)}
+        </div>
+
+        <div className="flex justify-center gap-4 mb-6">
+          <button
+            onClick={toggleTimer}
+            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            {isRunning ? '暫停' : '開始'}
+          </button>
+          <button
+            onClick={() => setTimeLeft(isFocusTime ? settings.focusTime * 60 : settings.breakTime * 60)}
+            className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          >
+            重置
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="block text-sm font-medium mb-1">專注時間 (分鐘)</label>
+            <input
+              type="number"
+              value={settings.focusTime}
+              onChange={(e) => updateSettings(parseInt(e.target.value) || 25, settings.breakTime)}
+              className="w-full px-3 py-2 border rounded"
+              min="1"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">休息時間 (分鐘)</label>
+            <input
+              type="number"
+              value={settings.breakTime}
+              onChange={(e) => updateSettings(settings.focusTime, parseInt(e.target.value) || 5)}
+              className="w-full px-3 py-2 border rounded"
+              min="1"
+            />
+          </div>
+        </div>
+
+        {isFocusTime && (
+          <div className="mb-6">
+            <input
+              type="text"
+              placeholder="正在進行的任務..."
+              value={currentTask}
+              onChange={(e) => setCurrentTask(e.target.value)}
+              className="w-full px-3 py-2 border rounded mb-2"
+            />
+            <textarea
+              placeholder="備註..."
+              value={currentNotes}
+              onChange={(e) => setCurrentNotes(e.target.value)}
+              className="w-full px-3 py-2 border rounded h-24"
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">工作記錄</h2>
+          <div className="flex gap-2">
+            {!user && (
+              <>
+                <button
+                  onClick={exportData}
+                  className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+                >
+                  導出數據
+                </button>
+                <label className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm cursor-pointer">
+                  導入數據
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={importData}
+                    className="hidden"
+                  />
+                </label>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="space-y-4">
+          {tasks.map((task) => (
+            <div key={task.id} className="border-b pb-4">
+              <div className="font-medium">{task.title}</div>
+              <div className="text-gray-600 text-sm">{task.notes}</div>
+              <div className="text-gray-400 text-xs">
+                {new Date(task.timestamp).toLocaleString()}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

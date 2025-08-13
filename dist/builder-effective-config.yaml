@@ -1,0 +1,15 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.tomato-timer.app
+productName: Tomato Timer
+mac:
+  category: public.app-category.productivity
+win:
+  target: nsis
+files:
+  - filter:
+      - electron/**/*
+      - out/**/*
+      - package.json
+electronVersion: 37.2.6

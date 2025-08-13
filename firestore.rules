@@ -1,0 +1,15 @@
+// Firebase security rules for Firestore
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 允許用戶讀寫自己的數據
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // 默認拒絕所有其他訪問
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
