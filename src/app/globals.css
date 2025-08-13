@@ -111,12 +111,36 @@ main {
   background-color: white;
   color: var(--text-primary);
   transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+  font-size: 1rem;
+  max-width: 100%;
 }
 
 .input:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 2px var(--ring);
+}
+
+/* 调整数字输入框的箭头按钮样式 */
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+/* 确保在小屏幕上有合适的内边距 */
+@media (max-width: 640px) {
+  .input {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
 }
 
 .label {

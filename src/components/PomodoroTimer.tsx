@@ -320,8 +320,8 @@ export default function PomodoroTimer() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div className="w-full">
             <label className="label">專注時間 (分鐘)</label>
             <input
               type="number"
@@ -329,9 +329,10 @@ export default function PomodoroTimer() {
               onChange={(e) => updateSettings(parseInt(e.target.value) || 25, settings.breakTime)}
               className="input"
               min="1"
+              style={{ width: '100%' }}
             />
           </div>
-          <div>
+          <div className="w-full">
             <label className="label">休息時間 (分鐘)</label>
             <input
               type="number"
@@ -339,29 +340,31 @@ export default function PomodoroTimer() {
               onChange={(e) => updateSettings(settings.focusTime, parseInt(e.target.value) || 5)}
               className="input"
               min="1"
+              style={{ width: '100%' }}
             />
           </div>
         </div>
 
         {isFocusTime && (
           <div className="mb-6 space-y-4">
-            <div>
+            <div className="w-full">
               <label className="label">當前任務</label>
               <input
                 type="text"
                 placeholder="正在進行的任務..."
                 value={currentTask}
                 onChange={(e) => setCurrentTask(e.target.value)}
-                className="input"
+                className="input w-full"
               />
             </div>
-            <div>
+            <div className="w-full">
               <label className="label">備註</label>
               <textarea
                 placeholder="添加一些任務細節..."
                 value={currentNotes}
                 onChange={(e) => setCurrentNotes(e.target.value)}
-                className="input min-h-[6rem] resize-y"
+                className="input w-full min-h-[6rem] resize-y"
+                style={{ minHeight: '6rem' }}
               />
             </div>
           </div>
