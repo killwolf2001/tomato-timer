@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "firebase": "^10.1.0",
+    "geist": "^1.4.2",
     "next": "13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -39,17 +40,17 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.31",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.16",
     "concurrently": "^9.2.0",
     "electron": "^37.2.6",
     "electron-builder": "^26.0.12",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
     "nextron": "^9.5.0",
+    "postcss": "^8.4.31",
     "tailwindcss": "^3.3.3",
     "typescript": "^5",
     "wait-on": "^8.0.4"

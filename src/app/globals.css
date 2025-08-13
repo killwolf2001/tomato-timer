@@ -21,7 +21,7 @@
 body {
   background-color: var(--background);
   min-height: 100vh;
-  font-family: var(--font-geist-sans);
+  font-family: "Geist", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -35,7 +35,7 @@ main {
 }
 
 .timer-display {
-  font-family: var(--font-geist-mono);
+  font-family: "Geist Mono", monospace;
   font-size: 5rem;
   font-weight: 700;
   color: var(--primary);
