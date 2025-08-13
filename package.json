@@ -2,13 +2,13 @@
   "name": "tomato-timer",
   "version": "1.0.0",
   "private": true,
-  "main": "electron/main.js",
+  "main": "electron/main.ts",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron-forge start\"",
     "electron-pack": "npm run build && electron-builder -mw",
     "postinstall": "electron-builder install-app-deps"
   },
@@ -40,7 +40,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/node": "^20",
+    "@types/electron-is-dev": "^1.1.3",
+    "@types/node": "^20.19.10",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.16",

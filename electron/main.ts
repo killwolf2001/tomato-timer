@@ -1,10 +1,10 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
-const isDev = require('electron-is-dev');
+import { app, BrowserWindow } from 'electron';
+import { join } from 'path';
+import isDev from 'electron-is-dev';
 
-let mainWindow;
+let mainWindow: BrowserWindow | null = null;
 
-function createWindow() {
+function createWindow(): void {
   // 創建瀏覽器窗口
   mainWindow = new BrowserWindow({
     width: 1024,
