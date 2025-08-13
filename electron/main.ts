@@ -20,7 +20,7 @@ function createWindow(): void {
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile('out/index.html');
+    mainWindow.loadFile(join(__dirname, '../out/index.html'));
   }
 
   mainWindow.on('closed', () => {
