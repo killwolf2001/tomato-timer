@@ -262,18 +262,18 @@ export default function PomodoroTimer() {
       
       <div className="card shadow-lg">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-4xl font-bold text-primary bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
             {isFocusTime ? '專注時間' : '休息時間'}
           </h1>
           {user && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <span className="text-xs sm:text-sm">
                 {syncStatus === 'synced' && '已同步'}
                 {syncStatus === 'syncing' && '同步中...'}
                 {syncStatus === 'error' && '同步失敗'}
               </span>
               <div 
-                className={`w-2 h-2 rounded-full ${
+                className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
                   syncStatus === 'synced' ? 'bg-green-500' :
                   syncStatus === 'syncing' ? 'bg-yellow-500' :
                   'bg-red-500'
@@ -295,17 +295,17 @@ export default function PomodoroTimer() {
           >
             {isRunning ? (
               <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
                 </svg>
-                暫停
+                <span className="text-sm sm:text-base">暫停</span>
               </>
             ) : (
               <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
-                開始
+                <span className="text-sm sm:text-base">開始</span>
               </>
             )}
           </button>
@@ -313,7 +313,7 @@ export default function PomodoroTimer() {
             onClick={() => setTimeLeft(isFocusTime ? settings.focusTime * 60 : settings.breakTime * 60)}
             className="btn btn-secondary"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             重置
@@ -373,8 +373,8 @@ export default function PomodoroTimer() {
 
       <div className="card">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-1.5 sm:gap-2">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             工作記錄
@@ -386,16 +386,16 @@ export default function PomodoroTimer() {
                   onClick={exportData}
                   className="btn btn-primary"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  導出數據
+                  <span className="text-xs sm:text-sm">導出數據</span>
                 </button>
                 <label className="btn btn-outline cursor-pointer">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                   </svg>
-                  導入數據
+                  <span className="text-xs sm:text-sm">導入數據</span>
                   <input
                     type="file"
                     accept=".json"
@@ -424,7 +424,7 @@ export default function PomodoroTimer() {
                   <div className="mt-2 text-gray-600 text-sm">{task.notes}</div>
                 )}
                 <div className="mt-3 text-gray-400 text-xs flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   {new Date(task.timestamp).toLocaleString()}
