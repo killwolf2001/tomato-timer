@@ -1,47 +1,15 @@
 import type { Metadata } from "next";
-import localFont from 'next/font/local';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import "./globals.css";
 
-const geistSans = localFont({
-  src: [
-    {
-      path: '../../node_modules/geist/font/fonts/geist-regular.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../../node_modules/geist/font/fonts/geist-medium.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: '../../node_modules/geist/font/fonts/geist-bold.woff2',
-      weight: '700',
-      style: 'normal',
-    },
-  ],
-  variable: '--font-geist'
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
 });
 
-const geistMono = localFont({
-  src: [
-    {
-      path: '../../node_modules/geist/font/fonts/geist-mono-regular.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../../node_modules/geist/font/fonts/geist-mono-medium.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: '../../node_modules/geist/font/fonts/geist-mono-bold.woff2',
-      weight: '700',
-      style: 'normal',
-    },
-  ],
-  variable: '--font-geist-mono'
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
 });
 
 export const metadata: Metadata = {
@@ -55,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="antialiased font-[var(--font-geist)]">
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body className="antialiased font-sans">
         <main>
           {children}
         </main>
